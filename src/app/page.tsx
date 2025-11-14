@@ -1,11 +1,14 @@
+import type { ReactNode } from "react";
+
 export default function Home() {
   const phoneDisplay = "773.287.3716";
   const phoneHref = "+17732873716";
   const noiseTexture =
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.3'/%3E%3C/svg%3E";
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E";
+  const accent = "#1D3370";
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12 text-slate-100">
+    <div className="relative flex min-h-svh items-center justify-center overflow-hidden px-4 py-8 text-white">
       <div
         className="pointer-events-none absolute inset-0 opacity-50"
         style={{
@@ -14,85 +17,93 @@ export default function Home() {
         }}
         aria-hidden="true"
       />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_55%)] opacity-60" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.2),_transparent_55%)] opacity-70" />
 
-      <article className="relative w-full max-w-sm overflow-hidden rounded-[36px] border border-white/10 bg-[#050607]/85 px-7 py-8 text-slate-100 shadow-[0_50px_90px_rgba(0,0,0,0.75)] backdrop-blur-3xl">
+      <article className="relative w-full max-w-xs space-y-5 overflow-hidden rounded-[30px] border border-white/10 bg-black/70 px-6 py-7 text-slate-100 shadow-[0_35px_70px_rgba(0,0,0,0.65)] backdrop-blur-2xl sm:max-w-sm">
         <div
-          className="pointer-events-none absolute inset-0 rounded-[36px]"
+          className="pointer-events-none absolute inset-0 rounded-[30px]"
           style={{
             background:
-              "linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0))",
+              "linear-gradient(140deg, rgba(255,255,255,0.18), rgba(255,255,255,0))",
             opacity: 0.3,
           }}
         />
 
-        <div className="relative space-y-8">
-          <header className="rounded-3xl border border-white/10 bg-[#353E43]/85 px-6 py-6 shadow-inner shadow-black/40">
-            <p className="text-xs uppercase tracking-[0.4em] text-slate-200/80">
+        <div className="relative space-y-6">
+          <header
+            className="rounded-2xl border border-white/15 px-5 py-5 shadow-inner shadow-black/40"
+            style={{ background: "linear-gradient(145deg,#03050b,#101422)" }}
+          >
+            <p className="text-[0.55rem] uppercase tracking-[0.45rem] text-white/65">
               Chromium Industries LLC.
             </p>
-            <h1 className="mt-4 text-3xl font-semibold leading-tight text-white">
+            <h1 className="mt-4 text-[1.7rem] font-semibold leading-tight text-white">
               Mike Tannura
             </h1>
-            <p className="text-sm text-slate-200/80">President</p>
+            <p className="text-sm text-white/70">President</p>
           </header>
 
-          <section className="space-y-6 px-1">
-            <p className="text-sm text-slate-300">
+          <section className="space-y-5 px-1 text-sm leading-6">
+            <p className="text-[0.7rem] font-semibold tracking-[0.1em] text-white">
               YOU&apos;LL BE SURPRISED WHAT ROLLS OFF OF OUR ROLLS
             </p>
 
-            <dl className="space-y-4 text-sm">
-              <div className="flex items-baseline justify-between">
-                <dt className="text-slate-400">Company</dt>
-                <dd className="text-right font-medium text-slate-100">
-                  Chromium Industries LLC.
-                </dd>
-              </div>
-              <div className="flex items-baseline justify-between">
-                <dt className="text-slate-400">Title</dt>
-                <dd className="text-right font-medium text-slate-100">
-                  President
-                </dd>
-              </div>
-              <div className="flex items-baseline justify-between">
-                <dt className="text-slate-400">Phone</dt>
-                <dd>
+            <dl className="space-y-3 text-sm">
+              <Detail label="Company" value="Chromium Industries LLC." />
+              <Detail label="Title" value="President" />
+              <Detail
+                label="Phone"
+                value={
                   <a
-                    className="text-right font-semibold text-white underline decoration-white/30 underline-offset-4 transition hover:text-slate-200"
+                    className="font-semibold text-white underline decoration-white/30 underline-offset-4 transition hover:text-[#9fb3ff]"
                     href={`tel:${phoneHref}`}
                   >
                     {phoneDisplay}
                   </a>
-                </dd>
-              </div>
-              <div className="flex flex-wrap items-baseline gap-2">
-                <dt className="text-slate-400">Email</dt>
-                <dd className="flex-1 text-right">
+                }
+              />
+              <Detail
+                label="Email"
+                value={
                   <a
-                    className="font-semibold text-white underline decoration-white/30 underline-offset-4 transition hover:text-slate-200"
+                    className="font-semibold text-white underline decoration-white/30 underline-offset-4 transition hover:text-[#9fb3ff]"
                     href="mailto:mtannura@chormiumind.com"
                   >
                     mtannura@chormiumind.com
                   </a>
-                </dd>
-              </div>
+                }
+              />
             </dl>
 
             <a
               href="/mike-tannura.vcf"
               download
-              className="cta-button mt-2 flex items-center justify-center rounded-2xl bg-white/90 px-6 py-4 text-base font-semibold text-slate-900 transition hover:bg-white"
+              className="cta-button flex items-center justify-center rounded-2xl px-5 py-3 text-base font-semibold text-white shadow-[0_18px_32px_rgba(0,0,0,0.4)] transition"
+              style={{ backgroundColor: accent }}
             >
               Save Contact
             </a>
 
-            <p className="text-center text-xs text-slate-400">
+            <p className="text-center text-[0.68rem] text-white/65">
               Custom Made in America.
             </p>
           </section>
         </div>
       </article>
+    </div>
+  );
+}
+
+type DetailProps = {
+  label: string;
+  value: ReactNode;
+};
+
+function Detail({ label, value }: DetailProps) {
+  return (
+    <div className="flex items-center justify-between text-white/70">
+      <dt className="text-[0.65rem] uppercase tracking-[0.25em]">{label}</dt>
+      <dd className="text-right text-sm font-medium text-white">{value}</dd>
     </div>
   );
 }
