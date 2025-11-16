@@ -31,7 +31,7 @@ export default function Home() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.25),_transparent_55%)] opacity-60" />
 
       <article
-        className="relative w-full max-w-xs space-y-6 overflow-hidden rounded-[34px] border border-white/5 px-6 py-7 text-slate-100 shadow-[0_28px_70px_rgba(3,3,3,0.8)] sm:max-w-sm"
+        className="relative w-full max-w-xs space-y-5 overflow-hidden rounded-[34px] border border-white/5 px-6 pt-7 pb-5 text-slate-100 shadow-[0_28px_70px_rgba(3,3,3,0.8)] sm:max-w-sm"
         style={{
           background: `linear-gradient(135deg, ${gunmetalStart}, ${gunmetalEnd})`,
         }}
@@ -44,7 +44,7 @@ export default function Home() {
           aria-hidden="true"
         />
 
-        <div className="relative space-y-6">
+        <div className="relative space-y-5">
           <header className="space-y-4 rounded-3xl border border-white/15 bg-white/5 px-5 py-5 shadow-inner shadow-black/40 backdrop-blur-[2px]">
             <p
               className="text-right text-[0.55rem] uppercase tracking-[0.45rem]"
@@ -69,7 +69,7 @@ export default function Home() {
             </div>
           </header>
 
-          <section className="space-y-5 px-1 text-sm leading-6">
+          <section className="space-y-4 px-1 text-sm leading-6">
             <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-center text-[0.8rem] font-semibold tracking-[0.08em] text-white uppercase shadow-inner shadow-black/50">
               You&apos;ll be surprised what rolls off of our rolls.
             </div>
@@ -115,7 +115,7 @@ export default function Home() {
 
             <p className="text-center text-[0.7rem] text-white/70">
               <span className="block font-semibold text-white">{footerPrimary}</span>
-              <span className="block italic">{footerSecondary}</span>
+              <span className="block pb-5 italic">{footerSecondary}</span>
             </p>
           </section>
         </div>
