@@ -85,7 +85,7 @@ export default function Home() {
             </a>
 
             <p className="text-center text-[0.68rem] text-white/65">
-              Custom Made in America.
+              Built in America, on Earth.
             </p>
           </section>
         </div>
