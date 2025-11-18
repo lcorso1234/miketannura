@@ -1,8 +1,9 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useCallback } from "react";
 
 export default function Home() {
   const phoneDisplay = "773.287.3716";
-  const phoneHref = "+17732873716";
   const noiseTexture =
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E";
   const accent = "#7CFF3A";
@@ -17,6 +18,55 @@ export default function Home() {
     { label: "Last Name", value: "Tannura" },
     { label: "Title", value: "President" },
   ];
+
+  const handleSaveContact = useCallback(() => {
+    const triggerDownload = (url: string, filename: string) => {
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+    };
+
+    // First, download the vCard so the contact is saved locally.
+    triggerDownload("/mike-tannura.vcf", "mike-tannura.vcf");
+
+    // Build a follow-up meeting invite for the next business day at 9:00 AM local time.
+    const now = new Date();
+    const meetingStart = new Date(now);
+    meetingStart.setDate(now.getDate() + 1);
+    meetingStart.setHours(9, 0, 0, 0);
+    const meetingEnd = new Date(meetingStart.getTime() + 30 * 60 * 1000);
+
+    const formatICSDate = (date: Date) =>
+      date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+    const icsContent =
+      [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Chromium Industries//Contact Save//EN",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+        "BEGIN:VEVENT",
+        `UID:${meetingStart.getTime()}@chromiumind.com`,
+        `DTSTAMP:${formatICSDate(now)}`,
+        `DTSTART:${formatICSDate(meetingStart)}`,
+        `DTEND:${formatICSDate(meetingEnd)}`,
+        "SUMMARY:Schedule time with Mike Tannura",
+        `DESCRIPTION:Saved Mike Tannura's contact. Phone: ${phoneDisplay}. Email: mtannura@chormiumind.com.`,
+        `LOCATION:Phone: ${phoneDisplay}`,
+        `ORGANIZER;CN=Mike Tannura:MAILTO:mtannura@chormiumind.com`,
+        "END:VEVENT",
+        "END:VCALENDAR",
+      ].join("\r\n") + "\r\n";
+
+    const meetingBlob = new Blob([icsContent], { type: "text/calendar" });
+    const meetingUrl = URL.createObjectURL(meetingBlob);
+    triggerDownload(meetingUrl, "mike-tannura-intro-meeting.ics");
+    setTimeout(() => URL.revokeObjectURL(meetingUrl), 0);
+  }, [phoneDisplay]);
 
   return (
     <div className="relative flex min-h-svh items-center justify-center overflow-hidden px-4 py-12 text-white">
@@ -74,35 +124,10 @@ export default function Home() {
               You&apos;ll be surprised what rolls off of our rolls.
             </div>
 
-            <dl className="space-y-3 text-sm">
-              <Detail
-                label="Phone Number"
-                value={
-                  <a
-                    className="font-semibold text-white underline decoration-white/30 underline-offset-4 transition hover:text-[#7cff3a]"
-                    href={`tel:${phoneHref}`}
-                  >
-                    {phoneDisplay}
-                  </a>
-                }
-              />
-              <Detail
-                label="Email"
-                value={
-                  <a
-                    className="font-semibold text-white underline decoration-white/30 underline-offset-4 transition hover:text-[#7cff3a]"
-                    href="mailto:mtannura@chormiumind.com"
-                  >
-                    mtannura@chormiumind.com
-                  </a>
-                }
-              />
-            </dl>
-
-            <a
-              href="/mike-tannura.vcf"
-              download
-              className="cta-button flex items-center justify-center rounded-2xl border border-white/15 px-5 py-3 text-base font-semibold text-white shadow-[0_18px_32px_rgba(0,0,0,0.7)] transition"
+            <button
+              type="button"
+              onClick={handleSaveContact}
+              className="cta-button mx-auto flex items-center justify-center rounded-2xl border border-white/15 px-5 py-3 text-base font-semibold text-white shadow-[0_18px_32px_rgba(0,0,0,0.7)] transition"
               style={{
                 backgroundColor: accent,
                 color: "#081207",
@@ -111,7 +136,7 @@ export default function Home() {
               }}
             >
               Save Contact
-            </a>
+            </button>
 
             <p className="text-center text-[0.7rem] text-white/70">
               <span className="block font-semibold text-white">{footerPrimary}</span>
@@ -120,20 +145,6 @@ export default function Home() {
           </section>
         </div>
       </article>
-    </div>
-  );
-}
-
-type DetailProps = {
-  label: string;
-  value: ReactNode;
-};
-
-function Detail({ label, value }: DetailProps) {
-  return (
-    <div className="flex items-center justify-between text-white/70">
-      <dt className="text-[0.65rem] uppercase tracking-[0.25em]">{label}</dt>
-      <dd className="text-right text-sm font-medium text-white">{value}</dd>
     </div>
   );
 }
