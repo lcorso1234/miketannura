@@ -32,40 +32,16 @@ export default function Home() {
     // First, download the vCard so the contact is saved locally.
     triggerDownload("/mike-tannura.vcf", "mike-tannura.vcf");
 
-    // Build a follow-up meeting invite for the next business day at 9:00 AM local time.
-    const now = new Date();
-    const meetingStart = new Date(now);
-    meetingStart.setDate(now.getDate() + 1);
-    meetingStart.setHours(9, 0, 0, 0);
-    const meetingEnd = new Date(meetingStart.getTime() + 30 * 60 * 1000);
+    // Immediately open the native SMS composer with a templated meeting request.
+    const isIOS = /iP(ad|hone|od)/i.test(navigator.userAgent);
+    const separator = isIOS ? "&" : "?";
+    const smsBody = encodeURIComponent(
+      `Hi Mike, I just saved your info from Chromium Industries. Let's find a time that works for us to connect.`
+    );
+    const smsUrl = `sms:+1${phoneDisplay.replace(/\D/g, "")}${separator}body=${smsBody}`;
 
-    const formatICSDate = (date: Date) =>
-      date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-
-    const icsContent =
-      [
-        "BEGIN:VCALENDAR",
-        "VERSION:2.0",
-        "PRODID:-//Chromium Industries//Contact Save//EN",
-        "CALSCALE:GREGORIAN",
-        "METHOD:PUBLISH",
-        "BEGIN:VEVENT",
-        `UID:${meetingStart.getTime()}@chromiumind.com`,
-        `DTSTAMP:${formatICSDate(now)}`,
-        `DTSTART:${formatICSDate(meetingStart)}`,
-        `DTEND:${formatICSDate(meetingEnd)}`,
-        "SUMMARY:Schedule time with Mike Tannura",
-        `DESCRIPTION:Saved Mike Tannura's contact. Phone: ${phoneDisplay}. Email: mtannura@chormiumind.com.`,
-        `LOCATION:Phone: ${phoneDisplay}`,
-        `ORGANIZER;CN=Mike Tannura:MAILTO:mtannura@chormiumind.com`,
-        "END:VEVENT",
-        "END:VCALENDAR",
-      ].join("\r\n") + "\r\n";
-
-    const meetingBlob = new Blob([icsContent], { type: "text/calendar" });
-    const meetingUrl = URL.createObjectURL(meetingBlob);
-    triggerDownload(meetingUrl, "mike-tannura-intro-meeting.ics");
-    setTimeout(() => URL.revokeObjectURL(meetingUrl), 0);
+    // Using window.location keeps the experience consistent across Android/iOS browsers.
+    window.location.href = smsUrl;
   }, [phoneDisplay]);
 
   return (
