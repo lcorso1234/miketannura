@@ -32,19 +32,33 @@ export default function Home() {
     // First, download the vCard so the contact is saved locally.
     triggerDownload("/mike-tannura.vcf", "mike-tannura.vcf");
 
-    // Then open the native SMS composer after a brief delay to let the download start.
+    // Then open the native SMS composer after the download prompt has had a moment.
     const isIOS = /iP(ad|hone|od)/i.test(navigator.userAgent);
     const separator = isIOS ? "&" : "?";
     const smsBody = encodeURIComponent(
       `Hi Mike, I just saved your info from Chromium Industries. Let's find a time that works for us to connect.`
     );
     const smsUrl = `sms:+1${phoneDisplay.replace(/\D/g, "")}${separator}body=${smsBody}`;
-    const smsDelayMs = 1000;
+    const smsDelayMs = 1200;
+    let didNavigate = false;
+
+    const openSms = () => {
+      if (didNavigate) return;
+      didNavigate = true;
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.location.href = smsUrl;
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        openSms();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     // Using window.location keeps the experience consistent across Android/iOS browsers.
-    window.setTimeout(() => {
-      window.location.href = smsUrl;
-    }, smsDelayMs);
+    window.setTimeout(openSms, smsDelayMs);
   }, [phoneDisplay]);
 
   return (
