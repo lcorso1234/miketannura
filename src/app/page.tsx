@@ -32,16 +32,19 @@ export default function Home() {
     // First, download the vCard so the contact is saved locally.
     triggerDownload("/mike-tannura.vcf", "mike-tannura.vcf");
 
-    // Immediately open the native SMS composer with a templated meeting request.
+    // Then open the native SMS composer after a brief delay to let the download start.
     const isIOS = /iP(ad|hone|od)/i.test(navigator.userAgent);
     const separator = isIOS ? "&" : "?";
     const smsBody = encodeURIComponent(
       `Hi Mike, I just saved your info from Chromium Industries. Let's find a time that works for us to connect.`
     );
     const smsUrl = `sms:+1${phoneDisplay.replace(/\D/g, "")}${separator}body=${smsBody}`;
+    const smsDelayMs = 1000;
 
     // Using window.location keeps the experience consistent across Android/iOS browsers.
-    window.location.href = smsUrl;
+    window.setTimeout(() => {
+      window.location.href = smsUrl;
+    }, smsDelayMs);
   }, [phoneDisplay]);
 
   return (
@@ -57,12 +60,11 @@ export default function Home() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.25),_transparent_55%)] opacity-60" />
 
       <article
-        className="relative w-full max-w-xs space-y-5 overflow-hidden rounded-[34px] border border-white/5 px-6 pt-7 pb-5 text-slate-100 shadow-[0_28px_70px_rgba(3,3,3,0.8)] sm:max-w-sm"
+        className="relative w-full max-w-xs space-y-5 overflow-hidden rounded-[34px] border border-white/5 px-6 pt-7 pb-6 text-slate-100 shadow-[0_28px_70px_rgba(3,3,3,0.8)] sm:max-w-sm"
         style={{
           background: `linear-gradient(135deg, ${gunmetalStart}, ${gunmetalEnd})`,
         }}
       >
-        <div className="pointer-events-none absolute inset-[1px] rounded-[32px] border border-white/10 shadow-inner shadow-black/70" />
         <div className="pointer-events-none absolute inset-0 rounded-[34px] opacity-25" style={{ background: "linear-gradient(150deg,rgba(255,255,255,0.2),transparent)" }} />
         <span
           className="absolute -right-6 top-8 h-28 w-28 rounded-full blur-3xl"
@@ -116,7 +118,7 @@ export default function Home() {
 
             <p className="text-center text-[0.7rem] text-white/70">
               <span className="block font-semibold text-white">{footerPrimary}</span>
-              <span className="block pb-5 italic">{footerSecondary}</span>
+              <span className="block italic">{footerSecondary}</span>
             </p>
           </section>
         </div>
