@@ -35,15 +35,15 @@ export default function Home() {
     // Then ask whether to text Mike; only open the SMS composer if confirmed.
     const isIOS = /iP(ad|hone|od)/i.test(navigator.userAgent);
     const separator = isIOS ? "&" : "?";
-    const smsBody = encodeURIComponent(
-      `Hi Mike, I just saved your info from Chromium Industries. Let's find a time that works for us to connect.`
-    );
+    const smsMessage =
+      "Hi Mike, I just saved your info from Chromium Industries. Let's find a time that works for us to connect.";
+    const smsBody = encodeURIComponent(smsMessage);
     const smsUrl = `sms:+1${phoneDisplay.replace(/\D/g, "")}${separator}body=${smsBody}`;
     const promptDelayMs = 1200;
 
     const promptForSms = () => {
       const shouldText = window.confirm(
-        "Contact saved. Do you want to send Mike a text message now?"
+        `Contact saved. Do you want to send Mike this text?\n\n${smsMessage}`
       );
       if (shouldText) {
         window.location.href = smsUrl;
