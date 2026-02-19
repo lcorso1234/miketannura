@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { FormEvent, useCallback, useMemo, useState } from "react";
 
 export default function Home() {
   const phoneDisplay = "773.287.3716";
@@ -12,12 +12,39 @@ export default function Home() {
   const footerPrimary = "Built in America, on Earth.";
   const footerSecondary =
     "Making relationships built to last, the American Way.";
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [senderName, setSenderName] = useState("");
+  const [senderEmail, setSenderEmail] = useState("");
+  const [senderPhone, setSenderPhone] = useState("");
+  const [formError, setFormError] = useState("");
 
   const headerDetails = [
     { label: "First Name", value: "Mike" },
     { label: "Last Name", value: "Tannura" },
     { label: "Title", value: "President" },
   ];
+
+  const cleanedMikePhone = useMemo(
+    () => `+1${phoneDisplay.replace(/\D/g, "")}`,
+    [phoneDisplay]
+  );
+
+  const openSmsComposer = useCallback(
+    (message: string) => {
+      const userAgent = navigator.userAgent;
+      const isIOS = /iP(ad|hone|od)/i.test(userAgent);
+      const isSamsung = /Samsung|SM-|SAMSUNG/i.test(userAgent);
+      const separator = isIOS ? "&" : "?";
+      // Samsung Messages handles CRLF line breaks more consistently than LF-only.
+      const normalizedMessage = isSamsung
+        ? message.replace(/\n/g, "\r\n")
+        : message;
+      const smsBody = encodeURIComponent(normalizedMessage);
+      const smsUrl = `sms:${cleanedMikePhone}${separator}body=${smsBody}`;
+      window.location.href = smsUrl;
+    },
+    [cleanedMikePhone]
+  );
 
   const handleSaveContact = useCallback(() => {
     const triggerDownload = (url: string, filename: string) => {
@@ -32,26 +59,54 @@ export default function Home() {
     // First, download the vCard so the contact is saved locally.
     triggerDownload("/mike-tannura.vcf", "mike-tannura.vcf");
 
-    // Then ask whether to text Mike; only open the SMS composer if confirmed.
-    const isIOS = /iP(ad|hone|od)/i.test(navigator.userAgent);
-    const separator = isIOS ? "&" : "?";
-    const smsMessage =
-      "Hi Mike, I just saved your info from Chromium Industries. Let's find a time that works for us to connect.";
-    const smsBody = encodeURIComponent(smsMessage);
-    const smsUrl = `sms:+1${phoneDisplay.replace(/\D/g, "")}${separator}body=${smsBody}`;
+    // Then ask whether to open a form and prepare a text to Mike.
     const promptDelayMs = 1200;
 
     const promptForSms = () => {
       const shouldText = window.confirm(
-        `Contact saved. Do you want to send Mike this text?\n\n${smsMessage}`
+        "Contact saved. Do you want to prepare a text message to Mike?"
       );
       if (shouldText) {
-        window.location.href = smsUrl;
+        setIsFormOpen(true);
       }
     };
 
     window.setTimeout(promptForSms, promptDelayMs);
-  }, [phoneDisplay]);
+  }, []);
+
+  const handleFormSubmit = useCallback(
+    (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const trimmedName = senderName.trim();
+      const trimmedEmail = senderEmail.trim();
+      const trimmedPhone = senderPhone.trim();
+
+      if (!trimmedName || !trimmedEmail || !trimmedPhone) {
+        setFormError("Please fill in your name, email, and phone number.");
+        return;
+      }
+
+      const shareParams = new URLSearchParams({
+        name: trimmedName,
+        email: trimmedEmail,
+        phone: trimmedPhone,
+      });
+      const shareableContactLink = `${window.location.origin}/api/contact-card?${shareParams.toString()}`;
+
+      const smsMessage = [
+        `Hi Mike, I just saved your contact from Chromium Industries.`,
+        `Name: ${trimmedName}`,
+        `Email: ${trimmedEmail}`,
+        `Phone: ${trimmedPhone}`,
+        `Save my contact: ${shareableContactLink}`,
+      ].join("\n");
+
+      setFormError("");
+      setIsFormOpen(false);
+      openSmsComposer(smsMessage);
+    },
+    [openSmsComposer, senderEmail, senderName, senderPhone]
+  );
 
   return (
     <div className="relative flex min-h-svh items-center justify-center overflow-hidden px-4 py-12 text-white">
@@ -129,6 +184,79 @@ export default function Home() {
           </section>
         </div>
       </article>
+
+      {isFormOpen ? (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/65 px-4">
+          <div className="w-full max-w-sm rounded-3xl border border-white/15 bg-[#171d23] p-5 shadow-2xl">
+            <h2 className="text-base font-semibold text-white">
+              Text Mike Your Contact Info
+            </h2>
+            <p className="mt-1 text-xs text-white/70">
+              Fill this in to prefill your text message and include a shareable
+              contact card link.
+            </p>
+
+            <form className="mt-4 space-y-3" onSubmit={handleFormSubmit}>
+              <label className="block text-xs text-white/75">
+                Full name
+                <input
+                  type="text"
+                  value={senderName}
+                  onChange={(event) => setSenderName(event.target.value)}
+                  className="mt-1 w-full rounded-xl border border-white/20 bg-black/30 px-3 py-2 text-sm text-white outline-none placeholder:text-white/40 focus:border-white/40"
+                  placeholder="Your name"
+                />
+              </label>
+
+              <label className="block text-xs text-white/75">
+                Email
+                <input
+                  type="email"
+                  value={senderEmail}
+                  onChange={(event) => setSenderEmail(event.target.value)}
+                  className="mt-1 w-full rounded-xl border border-white/20 bg-black/30 px-3 py-2 text-sm text-white outline-none placeholder:text-white/40 focus:border-white/40"
+                  placeholder="name@email.com"
+                />
+              </label>
+
+              <label className="block text-xs text-white/75">
+                Phone number
+                <input
+                  type="tel"
+                  value={senderPhone}
+                  onChange={(event) => setSenderPhone(event.target.value)}
+                  className="mt-1 w-full rounded-xl border border-white/20 bg-black/30 px-3 py-2 text-sm text-white outline-none placeholder:text-white/40 focus:border-white/40"
+                  placeholder="(555) 555-5555"
+                />
+              </label>
+
+              {formError ? (
+                <p className="text-xs text-red-300">{formError}</p>
+              ) : null}
+
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsFormOpen(false);
+                    setFormError("");
+                  }}
+                  className="flex-1 rounded-xl border border-white/25 px-3 py-2 text-sm text-white/90"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 rounded-xl px-3 py-2 text-sm font-semibold"
+                  style={{ backgroundColor: accent, color: "#081207" }}
+                >
+                  Create Text
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
